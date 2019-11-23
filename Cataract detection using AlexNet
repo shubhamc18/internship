@@ -1,0 +1,38 @@
+a = imread('im0002.ppm');
+
+matlabroot = 'C:\Users\shubham'
+
+Datasetpath = fullfile(matlabroot,'raulfuddin','Dataset1')
+Data = imageDatastore(Datasetpath,'IncludeSubfolders',true,'LabelSource','foldernames')
+
+layers = [imageInputLayer([605 700 3])
+convolution2dLayer(5,20)
+reluLayer
+maxPooling2dLayer(2,'stride',2)
+convolution2dLayer(5,20)
+reluLayer
+maxPooling2dLayer(2,'stride',2)
+fullyConnectedLayer(2)
+softmaxLayer
+classificationLayer()]
+
+options = trainingOptions('sgdm','MaxEpochs',15,'InitialLearnRate',0.01);
+convnet = trainNetwork(Data,layers,options)
+
+output = classify(convnet,a);
+
+tf1 = []
+for ii = 1:2
+    st = int2str(ii)
+    tf = ismember(output,st);
+    
+    tf1 = [tf1 tf];
+end
+
+out = find(tf1 ==1);
+
+if out==1
+    msgbox('NORMAL')
+elseif out==2
+    msgbox('cataract detected')
+end
